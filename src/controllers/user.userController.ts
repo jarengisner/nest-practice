@@ -9,7 +9,11 @@ export class UserController {
 
   @Get()
   async findAll() {
-    return await this.userService.findAll();
+    try {
+      return await this.userService.findAll();
+    } catch(err) {
+      throw new HttpException(`Error in finding all books: ${err.message}`, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
   @Get(':username')
@@ -29,7 +33,11 @@ export class UserController {
 
   @Post()
   async createUser(@Body() userDto: UserDto): Promise<User> {
-    const newUser = await this.userService.create(userDto);
-    return newUser;
+    try {
+      const newUser = await this.userService.create(userDto);
+      return newUser;
+    } catch(err) {
+      throw new HttpException(`Failed to create user: ${err.message}`, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 }
