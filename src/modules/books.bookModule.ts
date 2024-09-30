@@ -1,4 +1,3 @@
-
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { BookController } from 'src/controllers/books.booksController';
@@ -10,5 +9,4 @@ import { BookService } from 'src/services/books.bookService';
   controllers: [BookController],
   providers: [BookService],
 })
-
 export class BookModule {}

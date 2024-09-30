@@ -35,9 +35,11 @@ export class UserService {
 
   async findOne(username: string): Promise<User> {
     try {
-      const searchUser: User = await this.userModel.findOne({
-        username: username,
-      }).exec();
+      const searchUser: User = await this.userModel
+        .findOne({
+          username: username,
+        })
+        .exec();
 
       if (searchUser) {
         return searchUser;
@@ -47,8 +49,11 @@ export class UserService {
           HttpStatus.NOT_FOUND,
         );
       }
-    } catch(err) {
-      throw new HttpException(`Internal Server Error: ${err.message}`, HttpStatus.INTERNAL_SERVER_ERROR);
+    } catch (err) {
+      throw new HttpException(
+        `Internal Server Error: ${err.message}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 }

@@ -14,7 +14,7 @@ import { BookModule } from './modules/books.bookModule';
     }),
     MongooseModule.forRoot(config.CONNECT_URI),
     UserModule,
-    BookModule
+    BookModule,
   ],
   controllers: [AppController],
   providers: [AppService],
