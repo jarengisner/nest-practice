@@ -27,6 +27,11 @@ export class UserController {
     }
   }
 
+  /**
+   *
+   * @param username
+   * @returns
+   */
   @Get(':username')
   async getOne(@Param('username') username: string) {
     try {

@@ -1,12 +1,19 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { BookDto } from 'src/dto/books.bookDto';
 import { Book, BookDocument } from 'src/schema/books.bookSchema';
 
 Injectable();
 export class BookService {
   constructor(@InjectModel('Book') private bookModel: Model<BookDocument>) {}
 
+  /**
+   * Service to get all books from the database
+   *
+   * @returns - Array of all Book objects that can be extracted from the database
+   *
+   */
   async getAll(): Promise<any> {
     try {
       const allBooks: Book[] = await this.bookModel.find().exec();
@@ -27,6 +34,13 @@ export class BookService {
     }
   }
 
+  /**
+   * Service to get one book by it's title from the database
+   *
+   * @param title - Title of the book
+   * @returns - Promise of a Book class
+   *
+   */
   async getOneByTitle(title: string): Promise<Book> {
     try {
       const singleBook = await this.bookModel
@@ -46,6 +60,27 @@ export class BookService {
     } catch (err) {
       throw new HttpException(
         `Error getting one book by title: ${err.message}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  /**
+   * Service to create books in DB
+   *
+   * @param - Book data transfer object, allows for schema creation
+   * @returns - Promise of a Book object, after casting our data transfer object to an actual 
+   * Book class
+   *
+   */
+  async createBook(bookDto: BookDto): Promise<Book> {
+    try {
+      const newBook = new this.bookModel(bookDto);
+
+      return newBook.save();
+    } catch (err) {
+      throw new HttpException(
+        `Error creating a new book entry: ${err.message}`,
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
