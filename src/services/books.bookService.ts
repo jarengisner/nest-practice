@@ -54,7 +54,7 @@ export class BookService {
       } else {
         throw new HttpException(
           'No books found with that title',
-          HttpStatus.NOT_FOUND,
+          HttpStatus.NO_CONTENT,
         );
       }
     } catch (err) {
@@ -66,10 +66,41 @@ export class BookService {
   }
 
   /**
+   * Find a book by isbn number
+   *
+   * @param isbn - number used to identify books within global database, and this database
+   * @returns - Promise of a Book class
+   *
+   */
+  async getOneByISBN(isbn: number): Promise<Book> {
+    try {
+      const bookSearch = await this.bookModel
+        .findOne({
+          isbn: isbn,
+        })
+        .exec();
+
+      if (bookSearch) {
+        return bookSearch;
+      } else {
+        throw new HttpException(
+          'No book found by that isbn number',
+          HttpStatus.NO_CONTENT,
+        );
+      }
+    } catch (err) {
+      throw new HttpException(
+        `Error in finding book by isbn: ${err.message}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  /**
    * Service to create books in DB
    *
    * @param - Book data transfer object, allows for schema creation
-   * @returns - Promise of a Book object, after casting our data transfer object to an actual 
+   * @returns - Promise of a Book object, after casting our data transfer object to an actual
    * Book class
    *
    */
