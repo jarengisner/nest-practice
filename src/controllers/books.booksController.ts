@@ -6,6 +6,7 @@ import {
   HttpStatus,
   Param,
   Post,
+  Put,
 } from '@nestjs/common';
 import { BookDto } from 'src/dto/books.bookDto';
 import { Book } from 'src/schema/books.bookSchema';
@@ -14,7 +15,6 @@ import { BookService } from 'src/services/books.bookService';
 @Controller('books')
 export class BookController {
   constructor(private readonly bookService: BookService) {}
-
 
   /**
    * Returns all books from the database
@@ -93,6 +93,30 @@ export class BookController {
     } catch (err) {
       throw new HttpException(
         `An error occurred while creating a book: ${err.message}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  /**
+   * Takes in an isbn string through the path variables,
+   * and a book dto in the body, service updates book in db
+   *
+   * @param isbn - path variable isbn identification number
+   * @param bookDto - book data transfer object from the body of the request
+   * @returns Promise of a Book object
+   *
+   */
+  @Put(':isbn')
+  async updateBook(
+    @Param() isbn: string,
+    @Body() bookDto: BookDto,
+  ): Promise<Book> {
+    try {
+      return await this.bookService.updateBookByISBN(parseInt(isbn), bookDto);
+    } catch (err) {
+      throw new HttpException(
+        `An Error occurred with updating a book: ${err.message}`,
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }

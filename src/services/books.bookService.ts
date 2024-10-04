@@ -116,4 +116,35 @@ export class BookService {
       );
     }
   }
+
+  /**
+   *
+   * @param - isbn, identifying number for the book
+   * @param - bookDto, data transfer object for the book
+   * @returns Promise of a Book object, pulled from db
+   *
+   */
+  async updateBookByISBN(isbn: number, bookDto: BookDto): Promise<Book> {
+    try {
+      const updatedBook = await this.bookModel.findOneAndUpdate(
+        { isbn: isbn },
+        {
+          $set: {
+            title: bookDto.title,
+            description: bookDto.description,
+            price: bookDto.price,
+            quantity: bookDto.quantity,
+            isbn: bookDto.isbn,
+          },
+        },
+      );
+
+      return updatedBook;
+    } catch (err) {
+      throw new HttpException(
+        `Error updating the chosen book: ${err.message}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
 }
