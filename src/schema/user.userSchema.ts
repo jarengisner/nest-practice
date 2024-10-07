@@ -16,7 +16,7 @@ export class User {
 
 export const UserSchema = SchemaFactory.createForClass(User);
 
-/* UserSchema.statics.hashPassword = async (password: string) => {
+UserSchema.statics.hashPassword = async (password: string) => {
   try {
     const hash = await argon.hash(password);
 
@@ -38,4 +38,4 @@ UserSchema.methods.validatePassword = async (password: string) => {
       HttpStatus.INTERNAL_SERVER_ERROR,
     );
   }
-}; */
+};
