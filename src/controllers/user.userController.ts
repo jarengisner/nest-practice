@@ -7,6 +7,7 @@ import {
   Param,
   Post,
 } from '@nestjs/common';
+import { LoginData } from 'src/dto/user.loginData';
 import { UserDto } from 'src/dto/user.userDto';
 import { User } from 'src/schema/user.userSchema';
 import { UserService } from 'src/services/user.userService';
@@ -58,6 +59,21 @@ export class UserController {
     } catch (err) {
       throw new HttpException(
         `Failed to create user: ${err.message}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @Post('/login/:username')
+  async login(@Body() loginData: LoginData): Promise<boolean> {
+    try {
+      return await this.userService.validatePass(
+        loginData.username,
+        loginData.password,
+      );
+    } catch (err) {
+      throw new HttpException(
+        'Something occurred in endpoint side of user validation',
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }

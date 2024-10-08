@@ -24,12 +24,31 @@ export class UserService {
     }
   }
 
+  async validatePass(username: string, password: string): Promise<boolean> {
+    try {
+      const user = await this.findOne(username);
+
+      const result = await argon.verify(user.password, password);
+
+      return result;
+    } catch (err) {
+      throw new HttpException(
+        `There was an error within verification of the password: ${err.message}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
   /**
    *
    * @param userDto - User data transfer object, interface for user
    * @returns Promise which resolves the newly created user
    */
   async create(userDto: UserDto): Promise<User> {
+    const hashedPass = await this.hashPassword(userDto.password);
+
+    userDto.password = hashedPass;
+
     const newUser = new this.userModel(userDto);
 
     return newUser.save();

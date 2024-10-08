@@ -29,7 +29,7 @@ UserSchema.statics.hashPassword = async (password: string) => {
   }
 };
 
-UserSchema.methods.validatePassword = async (password: string) => {
+/*UserSchema.methods.validatePassword = async (password: string) => {
   try {
     return await argon.verify(this.password, password);
   } catch (err) {
@@ -38,4 +38,4 @@ UserSchema.methods.validatePassword = async (password: string) => {
       HttpStatus.INTERNAL_SERVER_ERROR,
     );
   }
-};
+};*/
