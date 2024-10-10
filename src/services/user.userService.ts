@@ -6,11 +6,19 @@ import { User, UserDocument } from 'src/schema/user.userSchema';
 import { UserDto } from '../dto/user.userDto';
 
 import * as argon from 'argon2';
+import { LoginData } from 'src/dto/user.loginData';
 
 @Injectable()
 export class UserService {
   constructor(@InjectModel('User') private userModel: Model<UserDocument>) {}
 
+  /**
+   * Hashes our input password using argon
+   *
+   * @param string - password passed in from endpoint
+   * @returns Promise - resolves a hashed string after hashing
+   *
+   */
   async hashPassword(password: string): Promise<string> {
     try {
       const hash = await argon.hash(password);
@@ -24,13 +32,31 @@ export class UserService {
     }
   }
 
-  async validatePass(username: string, password: string): Promise<boolean> {
+  /**
+   * Validates our password, going to look to convert to return user and token
+   *
+   * @param string - username and password strings which can be used to validate
+   * @returns boolean for now, want to abstract endpoint work to here
+   *
+   * This service will need to change in the future to return a custom class that includes
+   * both a User and a token, the controller will also have to change
+   */
+  async validatePass(loginData: LoginData): Promise<User> {
     try {
-      const user = await this.findOne(username);
+      const user = await this.findOne(loginData.username);
 
-      const result = await argon.verify(user.password, password);
+      const result = await argon.verify(user.password, loginData.password);
 
-      return result;
+      if (user && result) {
+        //fetch token
+        //need to change return type before this will work, after getting tokens working
+        return user;
+      } else {
+        throw new HttpException(
+          'Incorrect username or password',
+          HttpStatus.UNAUTHORIZED,
+        );
+      }
     } catch (err) {
       throw new HttpException(
         `There was an error within verification of the password: ${err.message}`,
@@ -103,4 +129,12 @@ export class UserService {
       );
     }
   }
+
+  //the below tokens will leverage a service for tokens that we can import similar to how we import our userservice into our controller
+  //async assignToken(){}
+
+  //async validateToken(){}
+
+  //async checkTokenExpiration(){}
+
 }

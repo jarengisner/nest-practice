@@ -51,6 +51,13 @@ export class UserController {
     }
   }
 
+  /**
+   * Creates user from data transfer object
+   *
+   * @param userDto - data transfer object for a user
+   * @returns Promise - resolves a User object
+   *
+   */
   @Post()
   async createUser(@Body() userDto: UserDto): Promise<User> {
     try {
@@ -64,13 +71,17 @@ export class UserController {
     }
   }
 
-  @Post('/login/:username')
-  async login(@Body() loginData: LoginData): Promise<boolean> {
+  /**
+   * Working, validates password
+   *
+   * @param Body - login data object that will be formed from body
+   * @returns Currently returns a boolean value to see if verified, want to change to return user and token to store
+   *
+   */
+  @Post('login')
+  async login(@Body() loginData: LoginData): Promise<User> {
     try {
-      return await this.userService.validatePass(
-        loginData.username,
-        loginData.password,
-      );
+      return await this.userService.validatePass(loginData);
     } catch (err) {
       throw new HttpException(
         'Something occurred in endpoint side of user validation',
