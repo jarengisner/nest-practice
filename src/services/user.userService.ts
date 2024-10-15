@@ -7,10 +7,14 @@ import { UserDto } from '../dto/user.userDto';
 
 import * as argon from 'argon2';
 import { LoginData } from 'src/dto/user.loginData';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class UserService {
-  constructor(@InjectModel('User') private userModel: Model<UserDocument>) {}
+  constructor(
+    @InjectModel('User') private userModel: Model<UserDocument>,
+    private jwtService: JwtService,
+  ) {}
 
   /**
    * Hashes our input password using argon
@@ -41,7 +45,7 @@ export class UserService {
    * This service will need to change in the future to return a custom class that includes
    * both a User and a token, the controller will also have to change
    */
-  async validatePass(loginData: LoginData): Promise<User> {
+  async validatePassAndSignToken(loginData: LoginData): Promise<any> {
     try {
       const user = await this.findOne(loginData.username);
 
@@ -50,7 +54,8 @@ export class UserService {
       if (user && result) {
         //fetch token
         //need to change return type before this will work, after getting tokens working
-        return user;
+        const payload = await this.assignToken(user.username);
+        return payload;
       } else {
         throw new HttpException(
           'Incorrect username or password',
@@ -131,10 +136,20 @@ export class UserService {
   }
 
   //the below tokens will leverage a service for tokens that we can import similar to how we import our userservice into our controller
-  //async assignToken(){}
+  async assignToken(username: string) {
+    try {
+      const payload = { sub: username, username: username };
+
+      return await this.jwtService.signAsync(payload);
+    } catch (err) {
+      throw new HttpException(
+        `Error within signing of JWT: ${err.message}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
 
   //async validateToken(){}
 
   //async checkTokenExpiration(){}
-
 }

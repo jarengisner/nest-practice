@@ -79,12 +79,12 @@ export class UserController {
    *
    */
   @Post('login')
-  async login(@Body() loginData: LoginData): Promise<User> {
+  async login(@Body() loginData: LoginData): Promise<any> {
     try {
-      return await this.userService.validatePass(loginData);
+      return await this.userService.validatePassAndSignToken(loginData);
     } catch (err) {
       throw new HttpException(
-        'Something occurred in endpoint side of user validation',
+        `Something occurred in endpoint side of user validation: ${err.message}`,
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
