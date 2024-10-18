@@ -2,6 +2,7 @@ import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
 import * as argon from 'argon2';
 import { HttpException, HttpStatus } from '@nestjs/common';
+import { BookDto } from 'src/dto/books.bookDto';
 
 export type UserDocument = HydratedDocument<User>;
 
@@ -12,6 +13,15 @@ export class User {
 
   @Prop({ required: true })
   password: string;
+
+  @Prop({ required: false })
+  tradeListings: BookDto[];
+
+  @Prop({ required: false })
+  activeTradeBook: BookDto;
+
+  @Prop({ required: false })
+  tradeId: number;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
@@ -28,14 +38,3 @@ UserSchema.statics.hashPassword = async (password: string) => {
     );
   }
 };
-
-/*UserSchema.methods.validatePassword = async (password: string) => {
-  try {
-    return await argon.verify(this.password, password);
-  } catch (err) {
-    throw new HttpException(
-      `Error within validation of the password: ${err.message}`,
-      HttpStatus.INTERNAL_SERVER_ERROR,
-    );
-  }
-};*/
