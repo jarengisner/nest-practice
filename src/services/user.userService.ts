@@ -1,5 +1,10 @@
 import { InjectModel } from '@nestjs/mongoose';
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  ExecutionContext,
+  HttpException,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
 import { Model } from 'mongoose';
 import { User, UserDocument } from 'src/schema/user.userSchema';
 
@@ -149,7 +154,11 @@ export class UserService {
     }
   }
 
-  //async validateToken(){}
+  async validateToken(context: ExecutionContext): Promise<string | undefined> {
+    const request = context.switchToHttp().getRequest();
+    const [type, token] = request.headers.authorization?.split(' ') ?? [];
+    return type === 'Bearer' ? token : undefined;
+  }
 
   //async checkTokenExpiration(){}
 }
